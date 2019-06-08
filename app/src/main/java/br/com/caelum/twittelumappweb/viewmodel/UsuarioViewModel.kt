@@ -9,4 +9,6 @@ class UsuarioViewModel(val repository: UsuarioRepository) : ViewModel() {
     fun salva(usuario: Usuario) = repository.salva(usuario)
     fun loga(usuario: Usuario) = repository.loga(usuario)
 
+    fun usuarioLogado() = repository.usuario()
+
 }
