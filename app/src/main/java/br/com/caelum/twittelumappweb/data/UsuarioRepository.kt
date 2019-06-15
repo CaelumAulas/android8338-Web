@@ -20,16 +20,15 @@ class UsuarioRepository(private val api: UsuarioApi) {
 
     }
 
+    fun loga(usuario: Usuario) {
+
+        api.loga(usuario, lidaComSucesso())
+    }
+
     private fun lidaComSucesso(): (Usuario) -> Unit {
         return { usuario: Usuario ->
             liveDataUsuario.postValue(usuario)
         }
     }
-
-    fun loga(usuario: Usuario) {
-        Log.i("logando", "$usuario")
-
-    }
-
 
 }

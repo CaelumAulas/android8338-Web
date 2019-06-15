@@ -9,4 +9,7 @@ interface UsuarioService {
 
     @POST("/usuario")
     fun cria(@Body usuario: Usuario): Call<Usuario>
+
+    @POST("/usuario/login")
+    fun loga(@Body usuario: Usuario): Call<Usuario>
 }

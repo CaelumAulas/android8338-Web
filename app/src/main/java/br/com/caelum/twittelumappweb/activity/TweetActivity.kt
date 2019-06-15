@@ -1,8 +1,10 @@
 package br.com.caelum.twittelumappweb.activity
 
+import android.Manifest
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -17,8 +19,10 @@ import android.widget.ImageView
 import android.widget.Toast
 import br.com.caelum.twittelumappweb.R
 import br.com.caelum.twittelumappweb.decodificaParaBase64
+import br.com.caelum.twittelumappweb.gps.GPS
 import br.com.caelum.twittelumappweb.modelo.Tweet
 import br.com.caelum.twittelumappweb.viewmodel.TweetViewModel
+import br.com.caelum.twittelumappweb.viewmodel.UsuarioViewModel
 import br.com.caelum.twittelumappweb.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_tweet.*
 import java.io.File
@@ -27,12 +31,28 @@ import java.io.File
 class TweetActivity : AppCompatActivity() {
 
     private lateinit var viewModel: TweetViewModel
+
+    private lateinit var gps: GPS
+
+    private val usuaViewModel: UsuarioViewModel by lazy {
+        ViewModelProviders.of(this, ViewModelFactory).get(UsuarioViewModel::class.java)
+    }
     private var localFoto: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tweet)
+
+        gps = GPS(this)
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            gps.buscaLocalizacao()
+
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 123)
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -86,6 +106,17 @@ class TweetActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == 123){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                gps.buscaLocalizacao()
+            }
+        }
+
+    }
+
 
     private fun publicaTweet() {
 
@@ -104,7 +135,13 @@ class TweetActivity : AppCompatActivity() {
 
         val foto: String? = tweet_foto.tag as String?
 
-        return Tweet(mensagemDoTweet, foto)
+        val (latitude, longitude) = gps.getCoodernada()
+
+        return Tweet(mensagemDoTweet,
+                foto = foto,
+                dono = usuaViewModel.usuarioLogado().value,
+                latitude = latitude,
+                longitude = longitude)
     }
 
 

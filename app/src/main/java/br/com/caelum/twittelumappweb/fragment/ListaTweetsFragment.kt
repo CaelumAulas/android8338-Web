@@ -1,5 +1,6 @@
 package br.com.caelum.twittelumappweb.fragment
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -28,11 +29,29 @@ class ListaTweetsFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.lista_fragment, container, false)
 
-        val lista = viewModel.lista()
 
-        val adapter = TweetAdapter(lista)
+        view.swipe.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_red_light
+        )
 
-        view.listaTweets.adapter = adapter
+        view.swipe.setOnRefreshListener {
+            viewModel.buscaTweets()
+        }
+
+        viewModel.lista().observe(this, Observer { lista ->
+
+            view.swipe.isRefreshing = false
+
+            lista?.let {
+                val adapter = TweetAdapter(lista)
+
+                view.listaTweets.adapter = adapter
+            }
+        })
+
+
 
 
         return view

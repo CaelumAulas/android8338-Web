@@ -28,4 +28,18 @@ class UsuarioApi(retrofit: Retrofit) {
         })
 
     }
+
+    fun loga(usuario: Usuario, lidaComSucesso: (Usuario) -> Unit) {
+
+
+        service.loga(usuario).enqueue(object : Callback<Usuario?> {
+            override fun onFailure(call: Call<Usuario?>, t: Throwable) {
+
+            }
+
+            override fun onResponse(call: Call<Usuario?>, response: Response<Usuario?>) {
+                response.body()?.let(lidaComSucesso)
+            }
+        })
+    }
 }

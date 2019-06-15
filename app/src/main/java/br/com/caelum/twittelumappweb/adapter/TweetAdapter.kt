@@ -19,6 +19,12 @@ class TweetAdapter(private val tweets: List<Tweet>) : BaseAdapter() {
         val view = inflater.inflate(R.layout.tweet_item, parent, false)
 
 
+
+        val nome = tweet.dono?.nome
+
+        view.item_dono.text = nome
+
+
         view.item_conteudo.text = tweet.mensagem
 
         tweet.foto?.let {
